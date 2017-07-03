@@ -20,20 +20,18 @@ pair<string, string> parseUrl(string inputURL){
     if( regex_search( inputURL, what, exrp ) ) {
         host = what[1];
         query.append(what[2]);
-        cout << host << " " << query << " hello\n";
         //cout << "what[1].first: " << what[1] << "\n"; 
     }
     return make_pair(host, query);
-    //return make_pair("hello", "world");
 }
 
 void crawl(){
-    ofstream outFile;
+    //ofstream outFile;
     pair<string, string> URL = que.front();
     que.pop();
     string host = URL.first;
     string path = URL.second;
-    outFile.open("crawled.txt", ios::app | ios::out);
+    //outFile.open("crawled.txt", ios::app | ios::out);
     
     try{
         boost::asio::io_service io_service;
@@ -89,20 +87,41 @@ void crawl(){
         }
         cout << "\n";
 
+        // string to hold html and input
+        string htmlResponse;
+        string input;
+        // ostringstream ss;
+
+        
         //write content out
-        if(response.size() > 0) cout << &response;
+        if(response.size() > 0){ //cout << &response;
+            // htmlResponse.append(&response);
+            //response_stream >> input;
+            //htmlResponse.append(input);
+            ostringstream ss;
+            ss << &response;
+            input = ss.str();
+            htmlResponse.append(input);
+        }
 
         //read until EOF
         boost::system::error_code error;
         while(boost::asio::read(socket,response,boost::asio::transfer_at_least(1),error)){
-            cout << &response;
+            //cout << &response;
+            //response_stream >> input;
+            //htmlResponse.append(input);
+            ostringstream ss;
+            ss << &response;
+            input = ss.str();
+            htmlResponse.append(input);
+
         }
         if(error != boost::asio::error::eof){
             throw boost::system::system_error(error);
         }
-        outFile << URL.first << URL.second << "\n";
-        outFile.close();
-    }
+        //outFile << URL.first << URL.second << "\n";
+        //outFile.close();
+            }
     catch (exception& e){
         cout << "exception: " << e.what() << "\n";
     }
