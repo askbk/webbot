@@ -33,7 +33,7 @@ void crawl(){
     que.pop();
     string host = URL.first;
     string path = URL.second;
-    outFile.open("crawled.txt", ios::ate);
+    outFile.open("crawled.txt", ios::app | ios::out);
     
     try{
         boost::asio::io_service io_service;
@@ -100,7 +100,8 @@ void crawl(){
         if(error != boost::asio::error::eof){
             throw boost::system::system_error(error);
         }
-        outFile.write(URL.first, sizeof URL.first);
+        outFile << URL.first << URL.second << "\n";
+        outFile.close();
     }
     catch (exception& e){
         cout << "exception: " << e.what() << "\n";
