@@ -6,10 +6,14 @@
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <regex>
+#include <libxml/tree.h>
+#include <libxml/HTMLparser.h>
+#include <libxml++/libxml++.h>
 
 
 using namespace std;
 using namespace boost::asio::ip;
+
 queue< pair<string, string > > que;
 set< pair<string, string> > crawled;
 
@@ -100,7 +104,7 @@ void crawl(){
             //htmlResponse.append(input);
             ostringstream ss;
             ss << &response;
-            input = ss.str();
+ ;           input = ss.str();
             htmlResponse.append(input);
         }
 
@@ -121,7 +125,22 @@ void crawl(){
         }
         //outFile << URL.first << URL.second << "\n";
         //outFile.close();
-            }
+        
+        // Parse HTML and create a DOM tree
+        xmlDoc* doc = htmlReadDoc((xmlChar*)htmlResponse.c_str(), NULL, NULL, HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+ 
+        // Encapsulate raw libxml document in a libxml++ wrapper
+        xmlNode* r = xmlDocGetRootElement(doc);
+        xmlpp::Element* root = new xmlpp::Element(r);
+ 
+        // Grab the IP address
+        string xpath = "//a/@href";
+        auto elements = root->find(xpath);
+        //cout << dynamic_cast<xmlpp::ContentNode*>(elements[0])->get_content() << std::endl;
+ 
+        delete root;
+        xmlFreeDoc(doc);
+    }
     catch (exception& e){
         cout << "exception: " << e.what() << "\n";
     }
