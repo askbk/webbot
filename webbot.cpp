@@ -10,7 +10,6 @@
 #include <libxml/HTMLparser.h>
 #include <libxml++/libxml++.h>
 
-
 using namespace std;
 using namespace boost::asio::ip;
 
@@ -133,9 +132,34 @@ void crawl(){
         xmlNode* r = xmlDocGetRootElement(doc);
         xmlpp::Element* root = new xmlpp::Element(r);
  
-        // Grab the IP address
-        string xpath = "//a/@href";
+        // get all link nodes
+        string xpath = "//a[@href]";
         auto elements = root->find(xpath);
+        
+        int links = elements.size();
+
+        // if links have been visited, add to crawl queue
+        //for(int i = 0; i < links; ++i){
+        //  if(crawled.find(XXX)==crawled.end()){
+        //      que.push(XXX);
+        //  }
+        //}
+        //xmlChar *link0 = xmlGetProp(elements[0], "href");
+        //cout << link0 << "\n";
+        //crawled.insert(link0);
+        
+        xmlChar *uri;
+	elements[0] = elements[0]->xmlChildrenNode;
+	while (elements[0] != NULL) {
+	    if ((!xmlStrcmp(elements[0]->name, (const xmlChar *)"reference"))) {
+	        uri = xmlGetProp(elements[0], "uri");
+		printf("uri: %s\n", uri);
+		xmlFree(uri);
+	    }
+	    elements[0] = elements[0]->next;
+	}
+
+
         //cout << dynamic_cast<xmlpp::ContentNode*>(elements[0])->get_content() << std::endl;
  
         delete root;
